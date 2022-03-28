@@ -1,4 +1,5 @@
 {
-  "serverID": "Guild ID of the server",
-  "token:" "Bot token",
+  "token": "Bot token",
+  "clientID": "OAuth2 Client ID",
+  "guildID": "Server ID"
 }
