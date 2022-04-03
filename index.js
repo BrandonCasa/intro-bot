@@ -1,6 +1,6 @@
 const config = require("./config.json");
 const commandHandler = require("./commands/commands.js");
-const { Client, Intents } = require("discord.js");
+const Discord = require("discord.js");
 
 const waitingForReply = [];
 function updateWaitingForReply(userId, type) {
@@ -24,13 +24,14 @@ function getWaitingForReply() {
   return waitingForReply;
 }
 
-const client = new Client({
+const client = new Discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
   intents: ["DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILDS", "GUILD_MEMBERS"],
 });
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  commandHandler.setup(client, updateWaitingForReply, getWaitingForReply);
 });
 
 client.on("messageCreate", async (message) => {
@@ -40,7 +41,7 @@ client.on("messageCreate", async (message) => {
     if (!message.cleanContent.startsWith("!")) return;
   }
 
-  commandHandler.handleCommand(message, updateWaitingForReply, getWaitingForReply, client);
+  commandHandler.handleCommand(message, updateWaitingForReply, getWaitingForReply, client, Discord);
 });
 
 client.login(config.token);
