@@ -63,7 +63,7 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
   const d = new Date();
   if (d.getTime() > names.slice(-1)[0].timestamp) {
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Please hold while we cross check your username with our organization." });
+      await DMChannel.send({ content: "Please hold while we cross check your handle with our organization." });
     });
     names = await reloadNames();
   }
@@ -112,7 +112,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
     await fetchedUser.createDM().then(async (DMChannel) => {
       const userId = fetchedUser.id;
       await DMChannel.send({
-        content: `For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.\n**The username is case sensitive. Please either copy paste or type it in precisely**.`,
+        content: `For the verification process to be successful, please type your **Star Citizen** handle, in which you have signed up in our org.\n**The handle is case sensitive. Please either copy paste or type it in precisely**.`,
       });
       updateWaitingForReply(userId, "add");
     });
@@ -122,7 +122,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
     await fetchedUser.createDM().then(async (DMChannel) => {
       const userId = fetchedUser.id;
       await DMChannel.send({
-        content: `For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.\n**The username is case sensitive. Please either copy paste or type it in precisely**.`,
+        content: `For the verification process to be successful, please type your **Star Citizen** handle, in which you have signed up in our org.\n**The handle is case sensitive. Please either copy paste or type it in precisely**.`,
       });
       updateWaitingForReply(userId, "add");
     });
