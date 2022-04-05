@@ -59,100 +59,110 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
   updateWaitingForReply(message.author.id, "remove");
   var names = await fs.readFileSync("./names.json", { encoding: "utf8", flag: "r" });
   names = JSON.parse(names);
-  let fetchedUser = await client.guilds.cache.get("840773742560018443").members.cache.get(message.author.id);
+  let fetchedUser = await client.guilds.cache.get("324216347397455873").members.cache.get(message.author.id);
   const d = new Date();
-  console.log(names, d.getTime());
   if (d.getTime() > names.slice(-1)[0].timestamp) {
-    let fetchedUser = await client.guilds.cache.get("840773742560018443").members.cache.get(message.author.id);
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Reloading members list, please hold..." });
+      await DMChannel.send({ content: "Please hold while we cross check your username with our organization." });
     });
     names = await reloadNames();
   }
 
   const verified = await verifyNames(message, updateWaitingForReply, getWaitingForReply, client);
-  let guild = await client.guilds.cache.get("840773742560018443"); // CHANGE THIS TO CORRECT GUILD ID
+  let guild = await client.guilds.cache.get("324216347397455873"); // CHANGE THIS TO CORRECT GUILD ID
   if (verified) {
-    guild.members.cache.get(message.author.id).roles.remove("958124693301391401");
-    guild.members.cache.get(message.author.id).roles.add("958124667380568085");
-    fetchedUser.send({ content: "Verification complete, you are now a member of INTRO." });
+    guild.members.cache.get(fetchedUser.id).roles.remove("957382287283081296");
+    guild.members.cache.get(fetchedUser.id).roles.add("957382068248146030");
+    await fetchedUser.send({ content: "Verification was **successful**! You are now a member of the INTRO Discord server." });
+    try {
+      await guild.members.cache.get(fetchedUser.id).setNickname(`${message.content} | INTRO`);
+    } catch (error) {}
     return true;
   } else {
-    guild.members.cache.get(message.author.id).roles.remove("958124667380568085");
-    fetchedUser.send({ content: "Verification failed, you are NOT a member of INTRO. If you input the wrong username, please retry the command." });
+    guild.members.cache.get(fetchedUser.id).roles.remove("957382068248146030");
+    await fetchedUser.send({ content: "Verification **failed**. You either entered the wrong username, or are not a member of the organization." });
     return false;
   }
 }
 
-async function command(message, updateWaitingForReply, getWaitingForReply, client) {
+async function command(message, updateWaitingForReply, getWaitingForReply, client, user) {
   const { default: fetch } = await import("node-fetch");
+  let guild = await client.guilds.cache.get("324216347397455873");
+  let fetchedUser;
+  if (user === null) {
+    fetchedUser = message.author;
+  } else {
+    fetchedUser = guild.members.cache.get(user.id);
+  }
+  if (guild.members.cache.get(fetchedUser.id).roles.cache.has("957382068248146030")) {
+    await fetchedUser.createDM().then(async (DMChannel) => {
+      await DMChannel.send({ content: "Hey, you have stated that you are already a member of the INTRO organization." });
+    });
+  } else if (guild.members.cache.get(fetchedUser.id).roles.cache.has("957382287283081296")) {
+    //message.member.roles.remove("957382287283081296");
+    //message.member.roles.add("957382068248146030");
+    //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
+    await fetchedUser.createDM().then(async (DMChannel) => {
+      const userId = fetchedUser.id;
+      await DMChannel.send({
+        content: `
+      For the verification progress to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
+      **The username is case sensitive. Please either copy paste or type it in precisely**.
+      `,
+      });
+      updateWaitingForReply(userId, "add");
+    });
+  } else if (!guild.members.cache.get(fetchedUser.id).roles.cache.has("957382287283081296")) {
+    //message.member.roles.add("957382068248146030");
+    //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
+    await fetchedUser.createDM().then(async (DMChannel) => {
+      const userId = fetchedUser.id;
+      await DMChannel.send({
+        content: `
+      For the verification progress to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
+      **The username is case sensitive. Please either copy paste or type it in precisely**.
+      `,
+      });
+      updateWaitingForReply(userId, "add");
+    });
+  } else {
+    await fetchedUser.createDM().then(async (DMChannel) => {
+      await DMChannel.send({ content: "Something went wrong. Please contact a moderator." });
+    });
+  }
+  if (message.author === client.user) return;
   message.delete();
-  if (message.member.roles.cache.has("958124667380568085")) {
-    let fetchedUser = message.author;
-    await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "You are already a member of INTRO." });
-    });
-  } else if (message.member.roles.cache.has("958124693301391401")) {
-    //message.member.roles.remove("958124693301391401");
-    //message.member.roles.add("958124667380568085");
-    //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
-    let fetchedUser = message.author;
-    await fetchedUser.createDM().then(async (DMChannel) => {
-      const userId = fetchedUser.id;
-      await DMChannel.send({ content: "What is your username on Star Citizen? (must be exact)" });
-      updateWaitingForReply(userId, "add");
-    });
-  } else if (!message.member.roles.cache.has("958124693301391401")) {
-    //message.member.roles.add("958124667380568085");
-    //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
-    let fetchedUser = message.author;
-    await fetchedUser.createDM().then(async (DMChannel) => {
-      const userId = fetchedUser.id;
-      await DMChannel.send({ content: "What is your username on Star Citizen? (must be exact)" });
-      updateWaitingForReply(userId, "add");
-    });
-  } else {
-    let fetchedUser = message.guild.members.cache.get(user.id);
-    await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Something went wrong." });
-    });
-  }
   return;
 }
 
-async function commandSpecial(message, updateWaitingForReply, getWaitingForReply, client, user) {
+async function commandGuest(message, updateWaitingForReply, getWaitingForReply, client, user) {
+  let guild = await client.guilds.cache.get("324216347397455873");
+  let fetchedUser = guild.members.cache.get(user.id);
   const { default: fetch } = await import("node-fetch");
-  if (message.member.roles.cache.has("958124667380568085")) {
-    let fetchedUser = message.guild.members.cache.get(user.id);
+  if (fetchedUser.roles.cache.has("957382287283081296")) {
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "You are already a member of INTRO." });
+      await DMChannel.send({ content: "You are already a guest. If you would like to verify, please react with the checkmark." });
     });
-  } else if (message.member.roles.cache.has("958124693301391401")) {
-    //message.member.roles.remove("958124693301391401");
-    //message.member.roles.add("958124667380568085");
+  } else if (fetchedUser.roles.cache.has("957382068248146030")) {
+    //message.member.roles.remove("957382287283081296");
+    //message.member.roles.add("957382068248146030");
     //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
-    let fetchedUser = message.guild.members.cache.get(user.id);
     await fetchedUser.createDM().then(async (DMChannel) => {
-      const userId = fetchedUser.id;
-      await DMChannel.send({ content: "What is your username on Star Citizen? (must be exact)" });
-      updateWaitingForReply(userId, "add");
+      await DMChannel.send({ content: "Hey, you have stated that you are already a member of the INTRO organization." });
     });
-  } else if (!message.member.roles.cache.has("958124693301391401")) {
-    //message.member.roles.add("958124667380568085");
+  } else if (!fetchedUser.roles.cache.has("957382287283081296")) {
+    //message.member.roles.add("957382068248146030");
     //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
-    let fetchedUser = message.guild.members.cache.get(user.id);
+    await fetchedUser.roles.add("957382287283081296");
     await fetchedUser.createDM().then(async (DMChannel) => {
-      const userId = fetchedUser.id;
-      await DMChannel.send({ content: "What is your username on Star Citizen? (must be exact)" });
-      updateWaitingForReply(userId, "add");
+      await DMChannel.send({ content: "You are now a guest. You may still verify by reacting with the checkmark." });
     });
   } else {
-    let fetchedUser = message.guild.members.cache.get(user.id);
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Something went wrong." });
+      await DMChannel.send({ content: "Something went wrong. Please contact a moderator." });
     });
   }
   return;
 }
 
-module.exports = { command, forceVerify, commandSpecial };
+module.exports = { command, forceVerify, commandGuest };

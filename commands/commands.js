@@ -2,16 +2,21 @@ const verifyCommand = require("./verifyCommand.js");
 const reactionRoles = require("./reactionRoles.js");
 
 function handleCommand(message, updateWaitingForReply, getWaitingForReply, client, Discord) {
-  switch (message.cleanContent.split("!")[1]) {
-    case "verify":
-      verifyCommand.command(message, updateWaitingForReply, getWaitingForReply, client);
-      break;
-    case "setupreactionroles":
-      reactionRoles.command(message, Discord, client);
-      break;
-    default:
-      return;
-      break;
+  if (message.cleanContent.split("!")[1] !== undefined) {
+    switch (message.cleanContent.split("!")[1].split(" ")[0]) {
+      case "verify":
+        verifyCommand.command(message, updateWaitingForReply, getWaitingForReply, client, null);
+        break;
+      case "forceverifyother":
+        verifyCommand.command(message, updateWaitingForReply, getWaitingForReply, client, message.mentions.users.first());
+        break;
+      case "setupreactionroles":
+        reactionRoles.command(message, Discord, client);
+        break;
+      default:
+        return;
+        break;
+    }
   }
   return;
 }
