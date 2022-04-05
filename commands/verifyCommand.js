@@ -71,16 +71,35 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
   const verified = await verifyNames(message, updateWaitingForReply, getWaitingForReply, client);
   let guild = await client.guilds.cache.get("324216347397455873"); // CHANGE THIS TO CORRECT GUILD ID
   if (verified) {
-    guild.members.cache.get(fetchedUser.id).roles.remove("957382287283081296");
-    guild.members.cache.get(fetchedUser.id).roles.add("957382068248146030");
-    await fetchedUser.send({ content: "Verification was **successful**! You are now a member of the INTRO Discord server." });
+    await guild.members.cache.get(fetchedUser.id).roles.remove("957382287283081296");
+    await guild.members.cache.get(fetchedUser.id).roles.add("957382068248146030");
+    await fetchedUser.send({
+      content: `
+    Hey, you are now a member of the INTRO Discord. You will be given the INTRO Member role.
+    
+    Have a happy stay!
+    If you run in to any problems whatsoever, please contact one of our Moderators.
+    
+    With kind regards,
+    The INTRO Executive Board`,
+    });
     try {
       await guild.members.cache.get(fetchedUser.id).setNickname(`${message.content} | INTRO`);
     } catch (error) {}
     return true;
   } else {
-    guild.members.cache.get(fetchedUser.id).roles.remove("957382068248146030");
-    await fetchedUser.send({ content: "Verification **failed**. You either entered the wrong username, or are not a member of the organization." });
+    await guild.members.cache.get(fetchedUser.id).roles.remove("957382068248146030");
+    await guild.members.cache.get(fetchedUser.id).roles.add("957382287283081296");
+    await fetchedUser.send({
+      content: `
+    Hey, you are not a member of the INTRO organization. You will be given the INTRO Guest role.
+    
+    Have a happy stay!
+    If you run in to any problems whatsoever, please contact one of our Moderators.
+    
+    With kind regards,
+    The INTRO Executive Board`,
+    });
     return false;
   }
 }
@@ -96,7 +115,9 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
   }
   if (guild.members.cache.get(fetchedUser.id).roles.cache.has("957382068248146030")) {
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Hey, you have stated that you are already a member of the INTRO organization." });
+      await DMChannel.send({
+        content: "Hey, you have stated that you are already a member of the INTRO organization. If you would like to revoke your membership status, please contact one of our Moderators.",
+      });
     });
   } else if (guild.members.cache.get(fetchedUser.id).roles.cache.has("957382287283081296")) {
     //message.member.roles.remove("957382287283081296");
@@ -106,7 +127,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
       const userId = fetchedUser.id;
       await DMChannel.send({
         content: `
-      For the verification progress to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
+      For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
       **The username is case sensitive. Please either copy paste or type it in precisely**.
       `,
       });
@@ -119,7 +140,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
       const userId = fetchedUser.id;
       await DMChannel.send({
         content: `
-      For the verification progress to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
+      For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
       **The username is case sensitive. Please either copy paste or type it in precisely**.
       `,
       });
@@ -141,21 +162,35 @@ async function commandGuest(message, updateWaitingForReply, getWaitingForReply, 
   const { default: fetch } = await import("node-fetch");
   if (fetchedUser.roles.cache.has("957382287283081296")) {
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "You are already a guest. If you would like to verify, please react with the checkmark." });
+      await DMChannel.send({ content: "Hey, you have already stated that you are not a member of the INTRO organization. If you would like to verify, please run the !verify command." });
     });
   } else if (fetchedUser.roles.cache.has("957382068248146030")) {
     //message.member.roles.remove("957382287283081296");
     //message.member.roles.add("957382068248146030");
     //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "Hey, you have stated that you are already a member of the INTRO organization." });
+      await DMChannel.send({
+        content: "Hey, you have stated that you are already a member of the INTRO organization. If you would like to revoke your membership status, please contact one of our Moderators.",
+      });
     });
   } else if (!fetchedUser.roles.cache.has("957382287283081296")) {
     //message.member.roles.add("957382068248146030");
     //message.author.send({ content: "Verification complete, you are now a member of INTRO." });
     await fetchedUser.roles.add("957382287283081296");
     await fetchedUser.createDM().then(async (DMChannel) => {
-      await DMChannel.send({ content: "You are now a guest. You may still verify by reacting with the checkmark." });
+      await DMChannel.send({
+        content: `
+      Hey, you have stated that you are not yet a member of the INTRO organization. You will be given the INTRO Guest role.
+
+      If you would still like to verify, you can always click the checkmark button again, or type !verify to verify yourself for the INTRO Member role.
+      
+      Have a happy stay!
+      If you run in to any problems whatsoever, please contact one of our Moderators.
+      
+      With kind regards,
+      The INTRO Executive Board
+      `,
+      });
     });
   } else {
     await fetchedUser.createDM().then(async (DMChannel) => {
