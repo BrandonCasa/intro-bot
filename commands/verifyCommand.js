@@ -28,12 +28,16 @@ async function reloadNames() {
       method: "POST",
     });
     const fetchText = await fetchData.text();
-    if (JSON.parse(fetchText).data === null) {
-      console.log(JSON.parse(fetchText));
-    } else {
-      console.log(JSON.parse(fetchText).data);
+    let htmlStuff;
+    try {
+      htmlStuff = JSON.parse(fetchText).data.html;
+    } catch (error) {
+      if (JSON.parse(fetchText).data === null) {
+        console.log(JSON.parse(fetchText));
+      } else {
+        console.log(JSON.parse(fetchText).data);
+      }
     }
-    const htmlStuff = JSON.parse(fetchText).data.html;
 
     const $ = cheerio.load(htmlStuff);
     if ($(".name").length == 0) {
