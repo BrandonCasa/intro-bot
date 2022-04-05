@@ -91,7 +91,7 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
       content: `Hey, you are now a member of the INTRO Discord. You will be given the INTRO Member role.\n\nHave a happy stay!\nIf you run in to any problems whatsoever, please contact one of our Moderators.\n\nWith kind regards,\nThe INTRO Executive Board`,
     });
     try {
-      await guild.members.cache.get(fetchedUser.id).setNickname(`${message.content} | INTRO`);
+      await guild.members.cache.get(fetchedUser.id).setNickname(`${message.content.replace("INTRO-", "")} | INTRO`);
     } catch (error) {}
     return true;
   } else {
