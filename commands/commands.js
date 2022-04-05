@@ -20,7 +20,6 @@ function handleCommand(message, updateWaitingForReply, getWaitingForReply, clien
         }
         break;
       default:
-        return;
         break;
     }
   }
