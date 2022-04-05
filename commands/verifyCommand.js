@@ -44,7 +44,12 @@ async function reloadNames() {
       break;
     }
     $(".nick").each((index, element) => {
-      names.push($(element).text().replace("INTRO-", ""));
+      if ($(element).text().includes("INTRO-")) {
+        names.push($(element).text());
+        names.push($(element).text().replace("INTRO-", ""));
+      } else {
+        names.push($(element).text());
+      }
     });
     await new Promise((r) => setTimeout(r, 500));
   }
