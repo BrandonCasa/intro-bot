@@ -2,7 +2,7 @@ const verifyCommand = require("./verifyCommand.js");
 const reactionRoles = require("./reactionRoles.js");
 
 function handleCommand(message, updateWaitingForReply, getWaitingForReply, client, Discord) {
-  let guild = await client.guilds.cache.get("324216347397455873");
+  let guild = client.guilds.cache.get("324216347397455873");
   let member = guild.members.cache.get(message.author.id);
   if (message.cleanContent.split("!")[1] !== undefined) {
     switch (message.cleanContent.split("!")[1].split(" ")[0]) {
