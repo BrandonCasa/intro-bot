@@ -74,14 +74,7 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
     await guild.members.cache.get(fetchedUser.id).roles.remove("957382287283081296");
     await guild.members.cache.get(fetchedUser.id).roles.add("957382068248146030");
     await fetchedUser.send({
-      content: `
-    Hey, you are now a member of the INTRO Discord. You will be given the INTRO Member role.
-    
-    Have a happy stay!
-    If you run in to any problems whatsoever, please contact one of our Moderators.
-    
-    With kind regards,
-    The INTRO Executive Board`,
+      content: `Hey, you are now a member of the INTRO Discord. You will be given the INTRO Member role.\n\nHave a happy stay!\nIf you run in to any problems whatsoever, please contact one of our Moderators.\n\nWith kind regards,\nThe INTRO Executive Board`,
     });
     try {
       await guild.members.cache.get(fetchedUser.id).setNickname(`${message.content} | INTRO`);
@@ -91,14 +84,7 @@ async function forceVerify(message, updateWaitingForReply, getWaitingForReply, c
     await guild.members.cache.get(fetchedUser.id).roles.remove("957382068248146030");
     await guild.members.cache.get(fetchedUser.id).roles.add("957382287283081296");
     await fetchedUser.send({
-      content: `
-    Hey, you are not a member of the INTRO organization. You will be given the INTRO Guest role.
-    
-    Have a happy stay!
-    If you run in to any problems whatsoever, please contact one of our Moderators.
-    
-    With kind regards,
-    The INTRO Executive Board`,
+      content: `Hey, you are not a member of the INTRO organization. You will be given the INTRO Guest role.\n\nHave a happy stay!\nIf you run in to any problems whatsoever, please contact one of our Moderators.\n\nWith kind regards,\nThe INTRO Executive Board`,
     });
     return false;
   }
@@ -126,10 +112,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
     await fetchedUser.createDM().then(async (DMChannel) => {
       const userId = fetchedUser.id;
       await DMChannel.send({
-        content: `
-      For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
-      **The username is case sensitive. Please either copy paste or type it in precisely**.
-      `,
+        content: `For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.\n**The username is case sensitive. Please either copy paste or type it in precisely**.`,
       });
       updateWaitingForReply(userId, "add");
     });
@@ -139,10 +122,7 @@ async function command(message, updateWaitingForReply, getWaitingForReply, clien
     await fetchedUser.createDM().then(async (DMChannel) => {
       const userId = fetchedUser.id;
       await DMChannel.send({
-        content: `
-      For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.
-      **The username is case sensitive. Please either copy paste or type it in precisely**.
-      `,
+        content: `For the verification process to be successful, please type your **Star Citizen** username, in which you have signed up in our org.\n**The username is case sensitive. Please either copy paste or type it in precisely**.`,
       });
       updateWaitingForReply(userId, "add");
     });
@@ -180,15 +160,7 @@ async function commandGuest(message, updateWaitingForReply, getWaitingForReply, 
     await fetchedUser.createDM().then(async (DMChannel) => {
       await DMChannel.send({
         content: `
-      Hey, you have stated that you are not yet a member of the INTRO organization. You will be given the INTRO Guest role.
-
-      If you would still like to verify, you can always click the checkmark button again, or type !verify to verify yourself for the INTRO Member role.
-      
-      Have a happy stay!
-      If you run in to any problems whatsoever, please contact one of our Moderators.
-      
-      With kind regards,
-      The INTRO Executive Board
+      Hey, you have stated that you are not yet a member of the INTRO organization. You will be given the INTRO Guest role.\n\nIf you would still like to verify, you can always click the checkmark button again, or type !verify to verify yourself for the INTRO Member role.\n\nHave a happy stay!\nIf you run in to any problems whatsoever, please contact one of our Moderators.\n\nWith kind regards,\nThe INTRO Executive Board
       `,
       });
     });
