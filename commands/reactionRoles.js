@@ -37,7 +37,12 @@ module.exports = {
     await messageEmbed.react(crossEmoji);
   },
   async listen(updateWaitingForReply, getWaitingForReply, client, verifyCommand) {
-    const channel = "957393541456363570";
+    let channel = "957393541456363570";
+    let fileExists = fs.existsSync("./embed-id.txt");
+    if (fileExists) {
+      var embedIDs = await fs.readFileSync("./embed-id.txt", { encoding: "utf8", flag: "r" });
+      channel = embedIDs.split(",")[1];
+    }
     client.on("messageReactionAdd", async (reaction, user) => {
       if (reaction.message.partial) await reaction.message.fetch();
       if (reaction.partial) await reaction.fetch();
