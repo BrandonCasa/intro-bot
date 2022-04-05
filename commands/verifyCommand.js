@@ -40,11 +40,11 @@ async function reloadNames() {
     }
 
     const $ = cheerio.load(htmlStuff);
-    if ($(".name").length == 0) {
+    if ($(".nick").length == 0) {
       break;
     }
-    $(".name").each((index, element) => {
-      names.push($(element).text());
+    $(".nick").each((index, element) => {
+      names.push($(element).text().replace("INTRO-", ""));
     });
     await new Promise((r) => setTimeout(r, 500));
   }
