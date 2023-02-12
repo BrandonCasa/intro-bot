@@ -32,33 +32,15 @@ const client = new Discord.Client({
 });
 
 const commands = [];
+const commandFiles = fs.readdirSync('./newCommands').filter(file => file.endsWith('.js'));
 
-const commandsPath = path.join(__dirname, 'newCommands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+client.commands = new Collection();
 
 for (const file of commandFiles) {
   const command = require(`./newCommands/${file}`);
   commands.push(command.data.toJSON());
+  client.commands.set(command.data.name, command);
 }
-
-const rest = new Discord.REST({ version: '10' }).setToken(config.token);
-
-(async () => {
-  try {
-    console.log(`Started refreshing ${commands.length} application (/) commands.`);
-
-    // The put method is used to fully refresh all commands in the guild with the current set
-    const data = await rest.put(
-      Discord.Routes.applicationCommands(config.clientID),
-      { body: commands },
-    );
-
-    console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-  } catch (error) {
-    // And of course, make sure you catch and log any errors!
-    console.error(error);
-  }
-})();
 
 
 client.on(Discord.Events.InteractionCreate, async interaction => {
@@ -82,6 +64,24 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   commandHandler.setup(client, updateWaitingForReply, getWaitingForReply);
+  const rest = new Discord.REST({ version: '10' }).setToken(config.token);
+
+  (async () => {
+    try {
+      console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+      // The put method is used to fully refresh all commands in the guild with the current set
+      const data = await rest.put(
+        Discord.Routes.applicationCommands(config.clientID),
+        { body: commands },
+      );
+
+      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+    } catch (error) {
+      // And of course, make sure you catch and log any errors!
+      console.error(error);
+    }
+  })();
 });
 
 client.on("messageCreate", async (message) => {

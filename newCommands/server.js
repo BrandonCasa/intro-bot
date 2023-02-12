@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
+const Discord = require('discord.js');
 
 module.exports = {
-  data: new SlashCommandBuilder()
+  data: new Discord.SlashCommandBuilder()
     .setName('server')
     .setDescription('Provides information about the server.'),
   async execute(interaction) {
