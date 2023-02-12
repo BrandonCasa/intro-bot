@@ -1,6 +1,8 @@
 const config = require("./config.json");
 const commandHandler = require("./commands/commands.js");
 const Discord = require("discord.js");
+const path = require('node:path');
+const fs = require('node:fs');
 
 const waitingForReply = [];
 function updateWaitingForReply(userId, type) {
