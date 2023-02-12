@@ -34,7 +34,7 @@ const client = new Discord.Client({
 const commands = [];
 const commandFiles = fs.readdirSync('./newCommands').filter(file => file.endsWith('.js'));
 
-client.commands = new Collection();
+client.commands = new Discord.Collection();
 
 for (const file of commandFiles) {
   const command = require(`./newCommands/${file}`);
