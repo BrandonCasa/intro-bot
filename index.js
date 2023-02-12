@@ -1,47 +1,47 @@
-const config = require("./config.json");
-const commandHandler = require("./commands/commands.js");
-const Discord = require("discord.js");
+const fs = require('node:fs');
+const path = require('node:path');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { token } = require('./config.json');
 
-const waitingForReply = [];
-function updateWaitingForReply(userId, type) {
-  switch (type) {
-    case "add":
-      if (!waitingForReply.includes(userId)) {
-        waitingForReply.push(userId);
-      }
-      break;
-    case "remove":
-      if (waitingForReply.includes(userId)) {
-        waitingForReply.splice(waitingForReply.indexOf(userId), 1);
-      }
-      break;
-    default:
-      break;
-  }
-  return waitingForReply;
-}
-function getWaitingForReply() {
-  return waitingForReply;
-}
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-const client = new Discord.Client({
-  partials: ["MESSAGE", "CHANNEL", "REACTION"],
-  intents: ["DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILDS", "GUILD_MEMBERS"],
-});
+client.commands = new Collection();
 
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  commandHandler.setup(client, updateWaitingForReply, getWaitingForReply);
-});
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-client.on("messageCreate", async (message) => {
-  if (waitingForReply.includes(message.author.id)) {
-    commandHandler.forceVerify(message, updateWaitingForReply, getWaitingForReply, client);
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  // Set a new item in the Collection with the key as the command name and the value as the exported module
+  if ('data' in command && 'execute' in command) {
+    client.commands.set(command.data.name, command);
   } else {
-    if (!message.cleanContent.startsWith("!")) return;
+    console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+  }
+}
+
+// Log in to Discord with your client's token
+client.login(token);
+
+client.on(Events.InteractionCreate, async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) {
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
   }
 
-  commandHandler.handleCommand(message, updateWaitingForReply, getWaitingForReply, client, Discord);
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+  }
 });
 
-client.login(config.token);
+client.once(Events.ClientReady, c => {
+  console.log(`Ready! Logged in as ${c.user.tag}`);
+});
