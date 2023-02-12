@@ -29,6 +29,54 @@ const client = new Discord.Client({
   intents: ["DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "GUILDS", "GUILD_MEMBERS"],
 });
 
+const commands = [];
+
+const commandsPath = path.join(__dirname, 'newCommands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(`./newCommands/${file}`);
+  commands.push(command.data.toJSON());
+}
+
+const rest = new Discord.REST({ version: '10' }).setToken(config.token);
+
+(async () => {
+  try {
+    console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+    // The put method is used to fully refresh all commands in the guild with the current set
+    const data = await rest.put(
+      Discord.Routes.applicationCommands(config.clientID),
+      { body: commands },
+    );
+
+    console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+  } catch (error) {
+    // And of course, make sure you catch and log any errors!
+    console.error(error);
+  }
+})();
+
+
+client.on(Discord.Events.InteractionCreate, async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) {
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
+  }
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+  }
+});
+
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   commandHandler.setup(client, updateWaitingForReply, getWaitingForReply);
